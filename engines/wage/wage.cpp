@@ -51,6 +51,9 @@
 #include "common/punycode.h"
 #include "common/system.h"
 #include "common/text-to-speech.h"
+#include "common/stream.h"
+#include "common/debug.h"
+#include "common/macresman.h"
 
 #include "audio/softsynth/pcspk.h"
 
@@ -63,6 +66,7 @@
 #include "wage/gui.h"
 #include "wage/script.h"
 #include "wage/world.h"
+#include "wage/entities.h"
 
 namespace Wage {
 
@@ -135,11 +139,11 @@ Common::Error WageEngine::run() {
 
 	// Your main event loop should be (invoked from) here.
 	_resManager = new Common::MacResManager();
+	showStartupScreen();
 	if (!_resManager->open(Common::Path(getGameFile()).punycodeDecode()))
 		error("Could not open %s as a resource fork", getGameFile());
 
 	_world = new World(this);
-
 	if (!_world->loadWorld(_resManager))
 		return Common::kNoGameDataFoundError;
 
@@ -665,5 +669,29 @@ void WageEngine::processTurn(Common::String *textInput, Designed *clickInput) {
 	_inputText.clear();
 }
 
-
-} // End of namespace Wage
+bool WageEngine::showStartupScreen() {
+	Common::SearchSet startupSet;
+	Common::MacFinderInfo startupFinderInfo;
+	Common::MacResIDArray resArray;
+	Common::SeekableReadStream *res;
+	Common::MacResIDArray::const_iterator iter;
+	Common::MacResManager *resMan = new Common::MacResManager();
+	startupSet.addDirectory(Common::Path("/home/isystemnotool/Projects/scummvm/wage-games-master/startrek"));
+	if(!resMan->open(Common::Path("StartUpScreen"), startupSet)){
+		warning ("failed to open StartUpScreen");
+		return false;
+	}           
+ 	if ((resArray = resMan->getResIDArray(MKTAG('S', 'C', 'R', 'N'))).size() == 0) {
+		warning("failed to get resArray");
+		return false;
+	} 
+	if(res = resMan->getResource(MKTAG('S', 'C', 'R', 'N'), resArray[0])) {
+   		warning("successfully load StartUpScreen");
+		return true;
+	}
+	else {
+	 	warning ("failed to load StartUpScreen");
+		return false;
+    }
+}  
+}// End of namespace Wage

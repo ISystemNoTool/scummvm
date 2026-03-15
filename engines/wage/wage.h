@@ -239,7 +239,7 @@ public:
 	Common::Error loadGameState(int slot) override;
 	Common::Error saveGameState(int slot, const Common::String &desc, bool isAutosave = false) override;
 	bool scummVMSaveLoadDialog(bool isSave);
-
+    bool showStartupScreen();
 private:
 	int getSceneIndex(Scene *scene) const;
 	Obj *getObjByOffset(int offset, int objBaseOffset) const;
